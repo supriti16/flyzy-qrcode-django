@@ -38,28 +38,27 @@ def User_Info(request):
                 mydata = mydata.replace(": ", "\":\"").replace("\r\n", "\",\"").replace("\",", "\",\n")
                 mydata=json.loads(mydata)
                 jsonData = {
-                    "passengerName": mydata["Passanger name"],
-                    "imageUrl": url,
-                    "pnr": "LKI997",
-                    "seatNo": mydata["Seat"],
-                    "seatClass": "Economy"
+                    "userId": request.data['userId'],
+                    "flightId": request.data['flightId'],
+                    "boardingPassId": ele.get('boardingPassId'),
+                    "name": mydata["Passanger name"],
+                    "pnr": "123456",
+                    "arrCity": mydata["To"],
+                    "depCity": mydata["From"],
+                    "Seat": mydata["Seat"]
+                    # "name": mydata["Passanger name"],
+                    # "imageUrl": url,
+                    # "pnr": "NA",
+                    # "arrCity": "NA",
+                    # "depCity": "Economy",
+                    # "Seat": mydata["Seat"]
                 }
-                boardingDataArray.append(jsonData)
-        updateUrl = 'https://us-central1-flyzydev.cloudfunctions.net/flight/updateBoardingPass/'
-        uploadPayload = {
-                "userId": request.data['userId'],
-                "flightId": request.data['flightId'],
-                "passengerInfo": boardingDataArray
-        }
-
-        x = requests.post(updateUrl, json=uploadPayload)
-
-
-
-        print(x.text)
-
-
+                postuserprocesseddata(jsonData)
         data = {'message': 'data uploaded successfully' }
         return JsonResponse(data,safe=False)
     except ValueError as e:
         print(e)
+
+def postuserprocesseddata(jsonData):
+    updateUrl = 'https://us-central1-flyzydev.cloudfunctions.net/flight/updateBoardingPassNew/'
+    requests.post(updateUrl, json=jsonData)
